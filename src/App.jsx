@@ -5,6 +5,18 @@ export default function App() {
   const [mode, setMode] = useState("By Connector");
   const [view, setView] = useState("MAIN");
 
+  // GitHub Pages-safe base path (works for /REPO_NAME/ deployments)
+  const BASE = import.meta.env.BASE_URL || "/";
+
+  const img = {
+    connectorThumb: `${BASE}connector-1.png`,
+    connectorMain: `${BASE}connector-2.jpg`,
+    tacThumb: `${BASE}tac-1.jpg`,
+    tacMain: `${BASE}tac-2.png`,
+    panelThumb: `${BASE}panel-1.jpg`,
+    panelMain: `${BASE}panel-2.jpg`,
+  };
+
   const sidebarData = {
     "By Connector": {
       items: [
@@ -14,7 +26,7 @@ export default function App() {
         { id: "P415", label: "P415", type: "connector" },
         { id: "J522", label: "J522", type: "connector" },
       ],
-      img: "https://topflitecomponents.com/wp-content/uploads/2022/06/Asset-1@4x-10-1-768x626.png",
+      img: img.connectorThumb,
     },
     "By TAC": {
       items: [
@@ -23,7 +35,7 @@ export default function App() {
         { id: "TAC 3", label: "TAC 3", type: "tac" },
         { id: "TAC 4", label: "TAC 4", type: "tac" },
       ],
-      img: "https://www.strantech.com/wp-content/uploads/2013/06/Cable-Assemblies-Photo-2-TFOCA-GenX-Rear-Mount-Receptacle-to-90degree-M38999-Connector-copy.jpg",
+      img: img.tacThumb,
     },
     "By Panel": {
       items: [
@@ -32,7 +44,7 @@ export default function App() {
         { id: "Panel 3", label: "Panel 3", type: "panel" },
         { id: "Panel 4", label: "Panel 4", type: "panel" },
       ],
-      img: "https://c7.alamy.com/comp/2AH8G39/rocket-disarming-access-panel-on-a-military-aircraft-with-glowing-light-2AH8G39.jpg",
+      img: img.panelThumb,
     },
   };
 
@@ -47,11 +59,11 @@ export default function App() {
   const getMainImage = (type) => {
     switch (type) {
       case "connector":
-        return "https://www.glenair.com/powerload/img/cover.jpg";
+        return img.connectorMain;
       case "tac":
-        return "https://www.airelectro.com/blog/wp-content/uploads/2024/08/MIL-DTL-Blog-Image-690x600-4.png";
+        return img.tacMain;
       case "panel":
-        return "https://aviationhumor.net/wp-content/uploads/2019/04/F-15-avionics-bay.jpg";
+        return img.panelMain;
       default:
         return "";
     }
@@ -79,15 +91,16 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
+      <div className="w-full md:w-64 bg-gray-900 text-white flex flex-col p-4">
         <button
-          className="mb-4 px-3 py-2 bg-gray-700 rounded"
-          onClick={resetViewer}
-        >
-          ← Back
-        </button>
+  className="mb-4 px-3 py-2 bg-gray-700 text-white rounded"
+  onClick={resetViewer}
+>
+  ← Back
+</button>
+
 
         <select
           className="mb-4 p-2 rounded bg-gray-800 text-white border border-gray-600 w-full"
@@ -110,7 +123,8 @@ export default function App() {
               <img
                 src={sidebarData[mode].img}
                 alt={item.label}
-                className="w-full h-20 object-contain mb-2"
+                className="w-12 h-12 md:w-full md:h-20 object-contain mx-auto mb-2"
+                loading="lazy"
               />
               <div className="text-sm">{item.label}</div>
             </motion.div>
@@ -120,21 +134,22 @@ export default function App() {
 
       {/* Main Content */}
       <div className="flex-1 relative bg-black text-white">
-        <div className="absolute top-4 left-0 w-full z-10 text-3xl font-bold text-center bg-white/20 py-2">
+        <div className="absolute top-4 left-0 w-full z-10 text-xl md:text-3xl font-bold text-center bg-white/20 py-2 px-2">
           Eclypse INT F15 Supplemental Instruction Guide (Sig)
         </div>
 
         {view === "MAIN" && (
-          <div className="w-full h-full relative flex justify-center items-center">
-            <iframe
-              title="F15E Strike Eagle"
-              width="1920"
-              height="1080"
-              frameBorder="0"
-              allow="autoplay; fullscreen; xr-spatial-tracking"
-              allowFullScreen
-              src="https://sketchfab.com/models/b7e942cd45e044d9872282f0f233740d/embed?autostart=1"
-            />
+          <div className="w-full h-full relative flex justify-center items-center p-2 md:p-4">
+            <div className="w-full max-w-6xl aspect-video">
+              <iframe
+                title="F15E Strike Eagle"
+                className="w-full h-full"
+                frameBorder="0"
+                allow="autoplay; fullscreen; xr-spatial-tracking"
+                allowFullScreen
+                src="https://sketchfab.com/models/b7e942cd45e044d9872282f0f233740d/embed?autostart=1"
+              />
+            </div>
 
             {hotspots.map((spot) => (
               <motion.div
@@ -158,11 +173,12 @@ export default function App() {
         )}
 
         {view !== "MAIN" && (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center p-2 md:p-4">
             <img
               src={getMainImage(view.type)}
               alt={view.label}
               className="max-w-full max-h-full object-contain"
+              loading="lazy"
             />
           </div>
         )}

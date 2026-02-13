@@ -1,0 +1,131 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+
+export default function App() {
+  const [mode, setMode] = useState("By Connector");
+  const [message, setMessage] = useState("");
+  const [view, setView] = useState("MAIN");
+
+  const sidebarData = {
+    "By Connector": { items: ["J109", "P210", "J332", "P415", "J522"] },
+    "By TAC": { items: ["TAC 1", "TAC 2", "TAC 3", "TAC 4"] },
+    "By Panel": { items: ["Panel 1", "Panel 2", "Panel 3", "Panel 4"] }
+  };
+
+  const hotspots = [
+    { id: "J109", top: "30%", left: "45%" },
+    { id: "P210", top: "42%", left: "55%" },
+    { id: "TAC 1", top: "55%", left: "35%" },
+    { id: "Panel 2", top: "65%", left: "60%" }
+  ];
+
+  const handleSelect = (id) => {
+    setMessage("Zooming into panel on aircraft...");
+    setTimeout(() => {
+      setView(id);
+      setMessage("");
+    }, 1000);
+  };
+
+  const resetViewer = () => {
+    setView("MAIN");
+    setMessage("");
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
+        <button
+          className="mb-4 px-3 py-2 bg-gray-700 rounded"
+          onClick={resetViewer}
+        >
+          ← Back
+        </button>
+
+        <select
+          className="mb-4 p-2 rounded bg-gray-800 text-white border border-gray-600 w-full"
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+        >
+          <option>By Connector</option>
+          <option>By TAC</option>
+          <option>By Panel</option>
+        </select>
+
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {sidebarData[mode].items.map((item) => (
+            <motion.div
+              key={item}
+              whileHover={{ scale: 1.05 }}
+              className="cursor-pointer bg-gray-800 p-3 rounded text-center"
+              onClick={() => handleSelect(item)}
+            >
+              {item}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 relative bg-black text-white">
+        <div className="absolute top-4 left-0 w-full z-10 text-3xl font-bold text-center bg-white/20 py-2">
+          Eclypse INT F15 Supplemental Instruction Guide (Sig)
+        </div>
+
+        {view === "MAIN" && (
+          <div className="w-full h-full relative">
+            <iframe
+              title="F-15 FIGHTER MODEL"
+              src="https://sketchfab.com/models/adedc9d76cc0474989357460d76e7a3b/embed"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allow="autoplay; fullscreen; xr-spatial-tracking"
+              allowFullScreen
+            ></iframe>
+
+            {hotspots.map((spot) => (
+              <motion.div
+                key={spot.id}
+                className="absolute cursor-pointer"
+                style={{ top: spot.top, left: spot.left }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.3 }}
+                onClick={() => handleSelect(spot.id)}
+              >
+                <div className="w-4 h-4 bg-red-500 rounded-full ring-4 ring-red-300" />
+                <div className="text-xs mt-1 bg-black/70 px-1 rounded">
+                  {spot.id}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {view !== "MAIN" && (
+          <div className="w-full h-full flex flex-col items-center justify-center">
+            <div className="text-4xl mb-4">{view}</div>
+            <div className="text-lg opacity-70 mb-4">Panel / Connector Detail View</div>
+            <img
+              src="https://via.placeholder.com/400x300"
+              alt="Detail"
+              className="max-w-full max-h-96"
+            />
+          </div>
+        )}
+
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded z-30"
+          >
+            {message}
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
